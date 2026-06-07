@@ -1,0 +1,93 @@
+# ==========================
+# DEPENDENCIAS
+# ==========================
+node_modules/
+
+# ==========================
+# VARIABLES DE ENTORNO
+# ==========================
+.env
+.env.*
+!.env.example
+
+# ==========================
+# BUILD Y COMPILACIÓN
+# ==========================
+dist/
+build/
+coverage/
+.next/
+out/
+
+# ==========================
+# TYPESCRIPT
+# ==========================
+*.tsbuildinfo
+
+# ==========================
+# LOGS
+# ==========================
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+
+# ==========================
+# CACHE
+# ==========================
+.cache/
+.parcel-cache/
+.vite/
+
+# ==========================
+# PRISMA
+# ==========================
+prisma/dev.db
+prisma/dev.db-journal
+prisma/*.db
+prisma/*.db-journal
+
+# Migraciones temporales (opcional)
+prisma/migrations/**/migration_lock.toml
+
+# ==========================
+# ARCHIVOS DEL SISTEMA
+# ==========================
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ==========================
+# VS CODE
+# ==========================
+.vscode/
+
+# ==========================
+# JETBRAINS
+# ==========================
+.idea/
+
+# ==========================
+# ARCHIVOS TEMPORALES
+# ==========================
+tmp/
+temp/
+*.tmp
+
+# ==========================
+# TESTS
+# ==========================
+.nyc_output/
+
+# ==========================
+# PNPM
+# ==========================
+.pnpm-store/
+
+# ==========================
+# ARCHIVOS DE BACKUP
+# ==========================
+*.bak
+*.backup
+*.old
