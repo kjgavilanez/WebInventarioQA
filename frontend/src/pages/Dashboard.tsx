@@ -5,6 +5,7 @@ import Navbar from "../components/Navbar";
 import api from "../services/api";
 import Spinner from "../components/Spinner";
 import Toast from "../components/Toast";
+import ModalConfirm from "../components/ModalConfirm";
 
 interface Producto {
   id: number;
@@ -45,7 +46,7 @@ export default function Dashboard() {
   const PRODUCTOS_POR_PAGINA = 8;
   const [modalUsuarios, setModalUsuarios] = useState(false);
   const [usuarios, setUsuarios] = useState<{id: number; nombre: string; email: string; rol: string}[]>([]);
-
+  const [confirm, setConfirm] = useState<{ mensaje: string; accion: () => void } | null>(null);
 
   useEffect(() => {
     if (!localStorage.getItem("token")) {
@@ -155,14 +156,20 @@ export default function Dashboard() {
   };
 
   const eliminar = async (id: number) => {
-    if (!confirm("¿Estás seguro de eliminar este producto?")) return;
-    try {
-      await api.delete(`/productos/${id}`);
-      await cargarDatos();
-      mostrarToast("Producto eliminado correctamente");
-    } catch {
-      mostrarToast("Error al eliminar el producto", "error");
-    }
+    setConfirm({
+      mensaje: "¿Estás seguro de que deseas eliminar este producto? Esta acción no se puede deshacer.",
+      accion: async () => {
+        try {
+          await api.delete(`/productos/${id}`);
+          await cargarDatos();
+          mostrarToast("Producto eliminado correctamente");
+        } catch {
+          mostrarToast("Error al eliminar el producto", "error");
+        } finally {
+          setConfirm(null);
+        }
+      },
+    });
   };
 
   const productosFiltrados = productos.filter(p =>
@@ -186,14 +193,22 @@ export default function Dashboard() {
   };
 
 const eliminarCategoria = async (id: number) => {
-  if (!confirm("¿Eliminar esta categoría?")) return;
-  try {
-    await api.delete(`/categorias/${id}`);
-    await cargarDatos();
-  } catch {
-    alert("No se puede eliminar una categoría con productos asociados");
-  }
+  setConfirm({
+    mensaje: "¿Eliminar esta categoría? No podrás eliminarla si tiene productos asociados.",
+    accion: async () => {
+      try {
+        await api.delete(`/categorias/${id}`);
+        await cargarDatos();
+        mostrarToast("Categoría eliminada correctamente");
+      } catch {
+        mostrarToast("No se puede eliminar una categoría con productos asociados", "error");
+      } finally {
+        setConfirm(null);
+      }
+    },
+  });
 };
+
 const mostrarToast = (mensaje: string, tipo: "exito" | "error" = "exito") => {
   setToast({ mensaje, tipo });
 };
@@ -205,15 +220,21 @@ const productosPaginados = productosFiltrados.slice(
 );
 
 const eliminarUsuario = async (id: number) => {
-  if (!confirm("¿Eliminar este usuario?")) return;
-  try {
-    await api.delete(`/usuarios/${id}`);
-    const res = await api.get("/usuarios");
-    setUsuarios(res.data);
-    mostrarToast("Usuario eliminado correctamente");
-  } catch {
-    mostrarToast("Error al eliminar usuario", "error");
-  }
+  setConfirm({
+    mensaje: "¿Eliminar este usuario? Esta acción no se puede deshacer.",
+    accion: async () => {
+      try {
+        await api.delete(`/usuarios/${id}`);
+        const res = await api.get("/usuarios");
+        setUsuarios(res.data);
+        mostrarToast("Usuario eliminado correctamente");
+      } catch {
+        mostrarToast("Error al eliminar usuario", "error");
+      } finally {
+        setConfirm(null);
+      }
+    },
+  });
 };
 
   return (
@@ -621,6 +642,13 @@ const eliminarUsuario = async (id: number) => {
               <button onClick={() => setModalUsuarios(false)} className="boton-cancelar">Cerrar</button>
             </div>
           </div>
+      )}
+      {confirm && (
+        <ModalConfirm
+          mensaje={confirm.mensaje}
+          onConfirmar={confirm.accion}
+          onCancelar={() => setConfirm(null)}
+        />
       )}
       {toast && (
 
