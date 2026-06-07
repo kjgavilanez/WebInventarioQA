@@ -20,7 +20,7 @@ export default function Catalogo() {
   const [busqueda, setBusqueda] = useState("");
   const [cargando, setCargando] = useState(true);
   const [pagina, setPagina] = useState(1);
-  const PRODUCTOS_POR_PAGINA = 2;
+  const PRODUCTOS_POR_PAGINA = 8;
   
 
   useEffect(() => {

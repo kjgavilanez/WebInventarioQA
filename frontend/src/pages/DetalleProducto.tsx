@@ -65,7 +65,6 @@ export default function DetalleProducto() {
     <div style={{ minHeight: "100vh", backgroundColor: "#0F172A" }}>
       <Navbar />
       <div className="contenido">
-        <button onClick={volver} style={styles.botonVolver}>← Volver</button>
 
         <div className="detalle-card">
           <div className="detalle-imagen">
@@ -121,6 +120,20 @@ export default function DetalleProducto() {
                 </span>
               </div>
             </div>
+            <button onClick={volver} style={{
+              
+              background: "none",
+              border: "1px solid #334155",
+              color: "#94A3B8",
+              padding: "0.5rem 1rem",
+              borderRadius: "6px",
+              cursor: "pointer",
+              fontSize: "0.9rem",
+              marginTop: "0.5rem",
+              width: "100%",
+            }}>
+              ← Volver
+            </button>
           </div>
         </div>
       </div>

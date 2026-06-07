@@ -42,7 +42,7 @@ export default function Dashboard() {
   const [cargandoProductos, setCargandoProductos] = useState(true);
   const [toast, setToast] = useState<{ mensaje: string; tipo: "exito" | "error" } | null>(null);
   const [pagina, setPagina] = useState(1);
-  const PRODUCTOS_POR_PAGINA = 2;
+  const PRODUCTOS_POR_PAGINA = 8;
   const [modalUsuarios, setModalUsuarios] = useState(false);
   const [usuarios, setUsuarios] = useState<{id: number; nombre: string; email: string; rol: string}[]>([]);
 
