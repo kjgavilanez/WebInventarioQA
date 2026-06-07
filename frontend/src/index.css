@@ -9,7 +9,6 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* Navbar responsive */
 .navbar {
   background-color: #1E293B;
   padding: 0 1.5rem;
@@ -59,12 +58,10 @@ body {
   white-space: nowrap;
 }
 
-/* Contenido principal */
 .contenido {
   padding: 1.5rem;
 }
 
-/* Encabezado dashboard */
 .encabezado {
   display: flex;
   justify-content: space-between;
@@ -87,7 +84,6 @@ body {
   flex-wrap: wrap;
 }
 
-/* Buscador */
 .buscador {
   padding: 0.6rem 1rem;
   border-radius: 8px;
@@ -99,14 +95,12 @@ body {
   max-width: 280px;
 }
 
-/* Grid de productos */
 .grid-productos {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: 1.25rem;
 }
 
-/* Tarjeta */
 .tarjeta {
   background-color: #1E293B;
   border-radius: 12px;
@@ -134,25 +128,25 @@ body {
 .tarjeta-info {
   padding: 1rem;
   flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
 }
 
 .tarjeta-nombre {
   color: #FFFFFF;
   font-size: 1rem;
   font-weight: bold;
-  margin-bottom: 0.4rem;
 }
 
 .tarjeta-precio {
   color: #22C55E;
   font-weight: bold;
-  margin-bottom: 0.25rem;
 }
 
 .tarjeta-stock {
   color: #94A3B8;
   font-size: 0.85rem;
-  margin-bottom: 0.25rem;
 }
 
 .tarjeta-categoria {
@@ -186,7 +180,6 @@ body {
   font-size: 0.85rem;
 }
 
-/* Modal */
 .modal-overlay {
   position: fixed;
   inset: 0;
@@ -248,7 +241,6 @@ body {
   flex-wrap: wrap;
 }
 
-/* Campos de formulario */
 .campo {
   display: flex;
   flex-direction: column;
@@ -311,6 +303,34 @@ body {
   font-size: 0.875rem;
 }
 
+/* Detalle producto */
+.detalle-card {
+  background-color: #1E293B;
+  border-radius: 12px;
+  border: 1px solid #334155;
+  overflow: hidden;
+  max-width: 600px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.detalle-imagen {
+  background-color: #0F172A;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 280px;
+  width: 100%;
+  overflow: hidden;
+}
+
+.detalle-imagen img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
 /* Responsive */
 @media (max-width: 640px) {
   .encabezado {
@@ -343,19 +363,18 @@ body {
     width: 100%;
     text-align: center;
   }
-  /* Fix tarjetas cortadas */
-.tarjeta-info {
-  padding: 1rem;
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 0.3rem;
+
+  .detalle-imagen {
+    height: 200px;
+  }
 }
 
-/* Fix buscador alineado */
 @media (min-width: 641px) {
   .encabezado-acciones {
     flex-wrap: nowrap;
   }
-}
+
+  .buscador {
+    min-width: 220px;
+  }
 }

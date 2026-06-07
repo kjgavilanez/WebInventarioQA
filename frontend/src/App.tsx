@@ -5,6 +5,7 @@ import Catalogo from "./pages/Catalogo";
 import NotFound from "./pages/NotFound";
 import RutaProtegida from "./components/RutaProtegida";
 import DetalleProducto from "./pages/DetalleProducto";
+import Register from "./pages/Register";
 
 function App() {
   return (
@@ -28,6 +29,7 @@ function App() {
             <DetalleProducto />
           </RutaProtegida>
         } />
+        <Route path="/register" element={<Register />} />
       </Routes>
     </BrowserRouter>
   );

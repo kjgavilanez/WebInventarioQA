@@ -5,6 +5,7 @@ import authRoutes from "./routes/auth.routes";
 import productoRoutes from "./routes/producto.routes";
 import categoriaRoutes from "./routes/categoria.routes";
 import imagenRoutes from "./routes/imagen.routes";
+import usuarioRoutes from "./routes/usuario.routes";
 
 dotenv.config();
 
@@ -21,7 +22,7 @@ app.use(express.json());
 app.use("/api/auth", authRoutes);
 app.use("/api/productos", productoRoutes);
 app.use("/api/categorias", categoriaRoutes);
-
+app.use("/api/usuarios", usuarioRoutes);
 
 app.use("/api/imagenes", imagenRoutes);
 

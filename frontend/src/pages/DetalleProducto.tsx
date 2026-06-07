@@ -41,12 +41,25 @@ export default function DetalleProducto() {
     navigate(isAdmin() ? "/dashboard" : "/catalogo");
   };
 
-  if (cargando || !producto) return (
+  if (cargando) return (
     <div style={{ minHeight: "100vh", backgroundColor: "#0F172A" }}>
-        <Navbar />
-        <Spinner />
+      <Navbar />
+      <Spinner />
     </div>
-    );
+  );
+
+  if (error || !producto) return (
+    <div style={{ minHeight: "100vh", backgroundColor: "#0F172A" }}>
+      <Navbar />
+      <div style={{ padding: "2rem", textAlign: "center" }}>
+        <p style={{ fontSize: "3rem" }}>📦</p>
+        <p style={{ color: "#EF4444", fontSize: "1.1rem", marginTop: "1rem" }}>
+          {error || "Producto no encontrado"}
+        </p>
+        <button onClick={volver} style={styles.botonVolver}>← Volver</button>
+      </div>
+    </div>
+  );
 
   return (
     <div style={{ minHeight: "100vh", backgroundColor: "#0F172A" }}>
@@ -54,16 +67,14 @@ export default function DetalleProducto() {
       <div className="contenido">
         <button onClick={volver} style={styles.botonVolver}>← Volver</button>
 
-        <div style={styles.card}>
-          {/* Imagen */}
-          <div style={styles.imagenBox}>
+        <div className="detalle-card">
+          <div className="detalle-imagen">
             {producto.imagenUrl
-              ? <img src={producto.imagenUrl} alt={producto.nombre} style={styles.imagen} />
+              ? <img src={producto.imagenUrl} alt={producto.nombre} />
               : <span style={{ fontSize: "4rem" }}>📦</span>
             }
           </div>
 
-          {/* Info */}
           <div style={styles.info}>
             <div style={styles.categoriaTag}>{producto.categoria.nombre}</div>
             <h1 style={styles.nombre}>{producto.nombre}</h1>
@@ -74,7 +85,10 @@ export default function DetalleProducto() {
                 color: producto.stock > 0 ? "#22C55E" : "#EF4444",
                 fontWeight: "bold",
               }}>
-                {producto.stock > 0 ? `✅ En stock: ${producto.stock} unidades` : "❌ Sin stock"}
+                {producto.stock > 0
+                  ? `✅ En stock: ${producto.stock} unidades`
+                  : "❌ Sin stock"
+                }
               </span>
             </div>
 
@@ -94,7 +108,7 @@ export default function DetalleProducto() {
                 <span style={styles.metaLabel}>Fecha de registro</span>
                 <span style={styles.metaValor}>
                   {new Date(producto.creadoEn).toLocaleDateString("es-ES", {
-                    year: "numeric", month: "long", day: "numeric"
+                    year: "numeric", month: "long", day: "numeric",
                   })}
                 </span>
               </div>
@@ -102,7 +116,7 @@ export default function DetalleProducto() {
                 <span style={styles.metaLabel}>Última actualización</span>
                 <span style={styles.metaValor}>
                   {new Date(producto.actualizadoEn).toLocaleDateString("es-ES", {
-                    year: "numeric", month: "long", day: "numeric"
+                    year: "numeric", month: "long", day: "numeric",
                   })}
                 </span>
               </div>
@@ -124,28 +138,6 @@ const styles: Record<string, React.CSSProperties> = {
     cursor: "pointer",
     marginBottom: "1.5rem",
     fontSize: "0.9rem",
-  },
-  card: {
-    backgroundColor: "#1E293B",
-    borderRadius: "12px",
-    border: "1px solid #334155",
-    overflow: "hidden",
-    display: "grid",
-    gridTemplateColumns: "1fr 1fr",
-    maxWidth: "900px",
-    margin: "0 auto",
-  },
-  imagenBox: {
-    backgroundColor: "#0F172A",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    minHeight: "400px",
-  },
-  imagen: {
-    width: "100%",
-    height: "100%",
-    objectFit: "cover",
   },
   info: {
     padding: "2rem",

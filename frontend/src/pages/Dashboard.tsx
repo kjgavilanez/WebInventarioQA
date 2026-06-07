@@ -43,6 +43,8 @@ export default function Dashboard() {
   const [toast, setToast] = useState<{ mensaje: string; tipo: "exito" | "error" } | null>(null);
   const [pagina, setPagina] = useState(1);
   const PRODUCTOS_POR_PAGINA = 2;
+  const [modalUsuarios, setModalUsuarios] = useState(false);
+  const [usuarios, setUsuarios] = useState<{id: number; nombre: string; email: string; rol: string}[]>([]);
 
 
   useEffect(() => {
@@ -56,12 +58,14 @@ export default function Dashboard() {
   const cargarDatos = async () => {
     setCargandoProductos(true);
     try {
-      const [prod, cats] = await Promise.all([
+      const [prod, cats, users] = await Promise.all([
         api.get("/productos"),
         api.get("/categorias"),
+        api.get("/usuarios"),
       ]);
       setProductos(prod.data);
       setCategorias(cats.data);
+      setUsuarios(users.data);
     } finally {
       setCargandoProductos(false);
     }
@@ -200,6 +204,18 @@ const productosPaginados = productosFiltrados.slice(
   pagina * PRODUCTOS_POR_PAGINA
 );
 
+const eliminarUsuario = async (id: number) => {
+  if (!confirm("¿Eliminar este usuario?")) return;
+  try {
+    await api.delete(`/usuarios/${id}`);
+    const res = await api.get("/usuarios");
+    setUsuarios(res.data);
+    mostrarToast("Usuario eliminado correctamente");
+  } catch {
+    mostrarToast("Error al eliminar usuario", "error");
+  }
+};
+
   return (
     <div style={{ minHeight: "100vh", backgroundColor: "#0F172A" }}>
       <Navbar />
@@ -234,6 +250,19 @@ const productosPaginados = productosFiltrados.slice(
                 </button>
                 <button onClick={() => abrirModal()} className="boton-agregar">
                   + Nuevo Producto
+                </button>
+
+                <button onClick={() => setModalUsuarios(true)} style={{
+                  padding: "0.6rem 1.2rem",
+                  borderRadius: "8px",
+                  border: "1px solid #334155",
+                  backgroundColor: "transparent",
+                  color: "#94A3B8",
+                  cursor: "pointer",
+                  fontWeight: "bold",
+                  whiteSpace: "nowrap",
+                }}>
+                  👥 Usuarios
                 </button>
               </>
             )}
@@ -523,6 +552,75 @@ const productosPaginados = productosFiltrados.slice(
             </div>
           </div>
         </div>
+      )}
+      {modalUsuarios && (
+        <div className="modal-overlay">
+          <div className="modal">
+            <div className="modal-header">
+              <h2 className="modal-titulo">Gestionar Usuarios</h2>
+              <button onClick={() => setModalUsuarios(false)} className="modal-boton-cerrar">✕</button>
+            </div>
+              
+
+              <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem", marginTop: "0.5rem" }}>
+                <label className="label">Usuarios registrados</label>
+                {usuarios.map(u => (
+                  <div key={u.id} style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    padding: "0.6rem 1rem",
+                    backgroundColor: "#0F172A",
+                    borderRadius: "8px",
+                    border: "1px solid #334155",
+                    gap: "0.5rem",
+                  }}>
+                    <div>
+                      <p style={{ color: "#FFFFFF", fontSize: "0.9rem", margin: 0 }}>{u.nombre}</p>
+                      <p style={{ color: "#64748B", fontSize: "0.8rem", margin: 0 }}>{u.email}</p>
+                    </div>
+                    <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+                      <select
+                        value={u.rol}
+                        onChange={async (e) => {
+                          try {
+                            await api.patch(`/usuarios/${u.id}/rol`, { rol: e.target.value });
+                            const res = await api.get("/usuarios");
+                            setUsuarios(res.data);
+                            mostrarToast("Rol actualizado correctamente");
+                          } catch {
+                            mostrarToast("Error al cambiar rol", "error");
+                          }
+                        }}
+                        style={{
+                          backgroundColor: "#1E293B",
+                          border: "1px solid #334155",
+                          color: u.rol === "ADMIN" ? "#2563EB" : "#22C55E",
+                          borderRadius: "6px",
+                          padding: "0.2rem 0.5rem",
+                          fontSize: "0.8rem",
+                          cursor: "pointer",
+                        }}
+                      >
+                        <option value="ADMIN">ADMIN</option>
+                        <option value="CLIENTE">CLIENTE</option>
+                      </select>
+                      <button
+                        onClick={() => eliminarUsuario(u.id)}
+                        style={{ background: "none", border: "none", color: "#EF4444", cursor: "pointer" }}
+                      >
+                        🗑️
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="modal-footer">
+              <button onClick={() => setModalUsuarios(false)} className="boton-cancelar">Cerrar</button>
+            </div>
+          </div>
       )}
       {toast && (
 

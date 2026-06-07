@@ -1,37 +1,43 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
 import api from "../services/api";
 
-export default function Login() {
-  const { login } = useAuth();
+export default function Register() {
   const navigate = useNavigate();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [form, setForm] = useState({
+    nombre: "",
+    email: "",
+    password: "",
+    confirmar: "",
+  });
   const [error, setError] = useState("");
   const [cargando, setCargando] = useState(false);
-  useEffect(() => {
-    
-    const token = localStorage.getItem("token");
-    const usuario = localStorage.getItem("usuario");
-    if (token && usuario) {
-      const { rol } = JSON.parse(usuario);
-      navigate(rol === "ADMIN" ? "/dashboard" : "/catalogo");
-    }
-  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-    setCargando(true);
 
+    if (form.password !== form.confirmar) {
+      setError("Las contraseñas no coinciden");
+      return;
+    }
+
+    if (form.password.length < 6) {
+      setError("La contraseña debe tener al menos 6 caracteres");
+      return;
+    }
+
+    setCargando(true);
     try {
-      const res = await api.post("/auth/login", { email, password });
-      login(res.data.token, res.data.usuario);
-      const rol = res.data.usuario.rol;
-      navigate(rol === "ADMIN" ? "/dashboard" : "/catalogo");
+      await api.post("/auth/register", {
+        nombre: form.nombre,
+        email: form.email,
+        password: form.password,
+        
+      });
+      navigate("/login");
     } catch (err: any) {
-      setError(err.response?.data?.error || "Error al iniciar sesión");
+      setError(err.response?.data?.error || "Error al registrar usuario");
     } finally {
       setCargando(false);
     }
@@ -40,18 +46,30 @@ export default function Login() {
   return (
     <div style={styles.container}>
       <div style={styles.card}>
-        <h1 style={styles.titulo}>Inventario QA</h1>
-        <p style={styles.subtitulo}>Sistema de Gestión</p>
+        <h1 style={styles.titulo}>Crear Cuenta</h1>
+        <p style={styles.subtitulo}>Sistema de Gestión de Inventario</p>
 
         <form onSubmit={handleSubmit} style={styles.form}>
+          <div style={styles.campo}>
+            <label style={styles.label}>Nombre completo</label>
+            <input
+              type="text"
+              value={form.nombre}
+              onChange={e => setForm({ ...form, nombre: e.target.value })}
+              style={styles.input}
+              placeholder="Tu nombre"
+              required
+            />
+          </div>
+
           <div style={styles.campo}>
             <label style={styles.label}>Email</label>
             <input
               type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              value={form.email}
+              onChange={e => setForm({ ...form, email: e.target.value })}
               style={styles.input}
-              placeholder="admin@inventario.com"
+              placeholder="correo@ejemplo.com"
               required
             />
           </div>
@@ -60,32 +78,47 @@ export default function Login() {
             <label style={styles.label}>Contraseña</label>
             <input
               type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              value={form.password}
+              onChange={e => setForm({ ...form, password: e.target.value })}
               style={styles.input}
-              placeholder="••••••••"
+              placeholder="Mínimo 6 caracteres"
+              required
+            />
+          </div>
+
+          <div style={styles.campo}>
+            <label style={styles.label}>Confirmar contraseña</label>
+            <input
+              type="password"
+              value={form.confirmar}
+              onChange={e => setForm({ ...form, confirmar: e.target.value })}
+              style={styles.input}
+              placeholder="Repite tu contraseña"
               required
             />
           </div>
 
           {error && <p style={styles.error}>{error}</p>}
 
-          <button 
-            type="submit" style={{
+          <button
+            type="submit"
+            style={{
               ...styles.boton,
               opacity: cargando ? 0.6 : 1,
               cursor: cargando ? "not-allowed" : "pointer",
             }}
-            disabled={cargando}>
-            {cargando ? "Ingresando..." : "Iniciar Sesión"}
+            disabled={cargando}
+          >
+            {cargando ? "Registrando..." : "Crear Cuenta"}
           </button>
         </form>
-        <p style={{ color: "#64748B", textAlign: "center", marginTop: "1.5rem", fontSize: "0.9rem" }}>
-          ¿No tienes cuenta?{" "}
-          <Link to="/register" style={{ color: "#2563EB" }}>
-            Regístrate
+
+        <p style={styles.link}>
+          ¿Ya tienes cuenta?{" "}
+          <Link to="/login" style={{ color: "#2563EB" }}>
+            Inicia sesión
           </Link>
-</p>
+        </p>
       </div>
     </div>
   );
@@ -104,7 +137,7 @@ const styles: Record<string, React.CSSProperties> = {
     padding: "2.5rem",
     borderRadius: "12px",
     width: "100%",
-    maxWidth: "400px",
+    maxWidth: "420px",
     boxShadow: "0 4px 24px rgba(0,0,0,0.4)",
   },
   titulo: {
@@ -146,7 +179,12 @@ const styles: Record<string, React.CSSProperties> = {
     color: "#FFFFFF",
     fontSize: "1rem",
     fontWeight: "bold",
-    cursor: "pointer",
     marginTop: "0.5rem",
+  },
+  link: {
+    color: "#64748B",
+    textAlign: "center",
+    marginTop: "1.5rem",
+    fontSize: "0.9rem",
   },
 };

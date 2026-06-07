@@ -40,22 +40,22 @@ export const login = async (req: Request, res: Response) => {
 };
 
 export const register = async (req: Request, res: Response) => {
-  const { nombre, email, password, rol } = req.body;
+  const { nombre, email, password } = req.body;
 
   if (!nombre || !email || !password) {
     return res.status(400).json({ error: "Todos los campos son requeridos" });
   }
 
   const existe = await prisma.usuario.findUnique({ where: { email } });
-
   if (existe) {
     return res.status(409).json({ error: "El email ya está registrado" });
   }
 
   const hash = await bcrypt.hash(password, 10);
 
+  // Siempre CLIENTE, ignoramos el rol que venga del body
   const usuario = await prisma.usuario.create({
-    data: { nombre, email, password: hash, rol: rol || "ADMIN" },
+    data: { nombre, email, password: hash, rol: "CLIENTE" },
   });
 
   return res.status(201).json({
@@ -64,4 +64,48 @@ export const register = async (req: Request, res: Response) => {
     email: usuario.email,
     rol: usuario.rol,
   });
+};
+
+export const cambiarRol = async (req: Request, res: Response) => {
+  const { rol } = req.body;
+
+  if (!["ADMIN", "CLIENTE"].includes(rol)) {
+    return res.status(400).json({ error: "Rol inválido" });
+  }
+
+  try {
+    const usuario = await prisma.usuario.update({
+      where: { id: Number(req.params.id) },
+      data: { rol },
+      select: { id: true, nombre: true, email: true, rol: true },
+    });
+    return res.json(usuario);
+  } catch {
+    return res.status(500).json({ error: "Error al cambiar rol" });
+  }
+};
+export const listarUsuarios = async (req: Request, res: Response) => {
+  try {
+    const usuarios = await prisma.usuario.findMany({
+      select: { id: true, nombre: true, email: true, rol: true },
+      orderBy: { creadoEn: "asc" },
+    });
+    return res.json(usuarios);
+  } catch {
+    return res.status(500).json({ error: "Error al obtener usuarios" });
+  }
+};
+
+export const eliminarUsuario = async (req: Request, res: Response) => {
+  try {
+    const id = Number(req.params.id);
+    // Evita que el admin se elimine a sí mismo
+    if (id === req.usuario!.id) {
+      return res.status(400).json({ error: "No puedes eliminarte a ti mismo" });
+    }
+    await prisma.usuario.delete({ where: { id } });
+    return res.json({ message: "Usuario eliminado" });
+  } catch {
+    return res.status(500).json({ error: "Error al eliminar usuario" });
+  }
 };
