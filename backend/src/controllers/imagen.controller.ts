@@ -1,5 +1,4 @@
 import { Request, Response } from "express";
-import { subirImagen } from "../services/cloudinary.service";
 
 export const uploadImagen = async (req: Request, res: Response) => {
   try {
@@ -7,7 +6,7 @@ export const uploadImagen = async (req: Request, res: Response) => {
       return res.status(400).json({ error: "No se envió ninguna imagen" });
     }
 
-    const url = await subirImagen(req.file.buffer);
+    const url = `${req.protocol}://${req.get("host")}/uploads/${req.file.filename}`;
     return res.json({ url });
   } catch (error: any) {
     return res.status(500).json({ error: error.message || "Error al subir imagen" });

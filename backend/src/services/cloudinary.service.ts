@@ -1,18 +1,26 @@
-import { v2 as cloudinary } from "cloudinary";
 import { Request } from "express";
 import multer from "multer";
+import path from "path";
+import fs from "fs";
 
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
+const UPLOADS_DIR = path.join(__dirname, "../../uploads");
+if (!fs.existsSync(UPLOADS_DIR)) {
+  fs.mkdirSync(UPLOADS_DIR, { recursive: true });
+}
+
+const storage = multer.diskStorage({
+  destination: (_req, _file, cb) => cb(null, UPLOADS_DIR),
+  filename: (_req, file, cb) => {
+    const unique = Date.now() + "-" + Math.round(Math.random() * 1e9);
+    const ext = path.extname(file.originalname) || ".jpg";
+    cb(null, unique + ext);
+  },
 });
 
-// Multer en memoria, no guarda en disco
 export const upload = multer({
-  storage: multer.memoryStorage(),
-  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB máximo
-  fileFilter: (req: Request, file, cb) => {
+  storage,
+  limits: { fileSize: 5 * 1024 * 1024 },
+  fileFilter: (_req: Request, file, cb) => {
     const tiposPermitidos = ["image/jpeg", "image/png", "image/webp"];
     if (tiposPermitidos.includes(file.mimetype)) {
       cb(null, true);
@@ -23,23 +31,5 @@ export const upload = multer({
 });
 
 export const subirImagen = (buffer: Buffer): Promise<string> => {
-  return new Promise((resolve, reject) => {
-    cloudinary.uploader.upload_stream(
-      {
-        folder: "inventario-qa",
-        transformation: [{ width: 500, height: 500, crop: "limit" }],
-      },
-      (error, result) => {
-        if (error || !result) return reject(error);
-        resolve(result.secure_url);
-      }
-    ).end(buffer);
-  });
-};
-
-export const eliminarImagen = async (url: string) => {
-  const partes = url.split("/");
-  const archivo = partes[partes.length - 1].split(".")[0];
-  const publicId = `inventario-qa/${archivo}`;
-  await cloudinary.uploader.destroy(publicId);
+  return Promise.reject(new Error("Cloudinary no está configurado"));
 };
